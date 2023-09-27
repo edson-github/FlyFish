@@ -51,7 +51,7 @@ class UpgradeLcapWeb(Core):
         place_holder_config_script = {
             "CW_LOCAL_IP": self.local_ip,
             "CW_LOCAL_PORT": cw_lcap_tengine_service_port,
-            
+
             "CW_INSTALL_APP_DIR": os.path.dirname(base_dir_path),
         }
         self.replace(config_path, place_holder_config_script)
@@ -60,17 +60,17 @@ class UpgradeLcapWeb(Core):
         # 恢复components
         back_component_path = os.path.join(self.para.backup_path, "www/components/*")
         target_component_path = os.path.join(app_path, "www/components")
-        self.sys_cmd("cp -rf {} {}/".format(back_component_path, target_component_path))
+        self.sys_cmd(f"cp -rf {back_component_path} {target_component_path}/")
 
         # 恢复applications
         back_app_path = os.path.join(self.para.backup_path, "www/applications/*")
         target_app_path = os.path.join(app_path, "www/applications")
-        self.sys_cmd("cp -rf {} {}/".format(back_app_path, target_app_path))
+        self.sys_cmd(f"cp -rf {back_app_path} {target_app_path}/")
 
         # 恢复componentGroup
         back_com_group_path = os.path.join(self.para.backup_path, "www/componentGroup/*")
         target_com_group_path = os.path.join(app_path, "www/componentGroup")
-        self.sys_cmd("cp -rf {} {}/".format(back_com_group_path, target_com_group_path))
+        self.sys_cmd(f"cp -rf {back_com_group_path} {target_com_group_path}/")
 
         self.sys_cmd('chown -R {0}:{0} {1}'.format(run_user, app_path))
 

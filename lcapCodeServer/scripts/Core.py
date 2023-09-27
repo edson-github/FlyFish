@@ -60,8 +60,7 @@ class Core:
         parser.add_argument("--local_ip", "-local_ip", help="指定IP地址")
         parser.add_argument("--version", "-version", help="版本信息")
         parser.add_argument("--backup_path", "-backup_path", help="该服务备份绝对路径")
-        param = parser.parse_args()
-        return param
+        return parser.parse_args()
 
     @staticmethod
     def out(msg):
@@ -133,9 +132,7 @@ class Core:
         """
         查询dict是否存在空值
         """
-        if len(list(filter(lambda x: x is None, check_dict.values()))) != 0:
-            return False
-        return True
+        return not list(filter(lambda x: x is None, check_dict.values()))
 
     @staticmethod
     def append_file(path, data):
@@ -176,10 +173,7 @@ class Core:
     @staticmethod
     def is_root():
         """当前执行脚本的用户是否为 root"""
-        if os.getuid() == 0:
-            return True
-        else:
-            return False
+        return os.getuid() == 0
 
     def change_user(self):
         if self.install_args.get("run_user") == "root":
@@ -281,8 +275,7 @@ class Core:
         for _ in result:
             port = [i.get("default") for i in _[1] if i.get("key") == port_key]
             port_str = port_str + "{0}:{1},".format(_[0], port[0])
-        port_str = port_str[:-1] if port_str.endswith(",") else port_str
-        return port_str
+        return port_str[:-1] if port_str.endswith(",") else port_str
 
     def instance_para_ip_port_str(self, instance_name, port_key):
         """
@@ -294,8 +287,7 @@ class Core:
         key = ["ip", "ports"]
         result = self.instance_para(instance_name, key)
         port = [i.get("default") for i in result[1] if i.get("key") == port_key]
-        port_str = "{0}:{1}".format(result[0], port[0])
-        return port_str
+        return "{0}:{1}".format(result[0], port[0])
 
     def instance_para(self, instance_name, key):
         """
@@ -437,11 +429,11 @@ class Core:
         # 用户不存在即创建
         cmd = "cat /etc/passwd |awk -F ':' '{print $1}'"
         user = self.install_args.get('run_user') if \
-            self.install_args.get('run_user') else 'root'
+                self.install_args.get('run_user') else 'root'
         user_list = self.sys_cmd(cmd).split('\n')
         if user not in user_list:
             time.sleep(random.uniform(0, 5))
-            self.sys_cmd('useradd -s /bin/bash {}'.format(user))
+            self.sys_cmd(f'useradd -s /bin/bash {user}')
 
         #  更改文件归属
         check_keys = [
@@ -455,7 +447,7 @@ class Core:
             path_dirs = path_dirs + (os.path.join(os.path.dirname(path_dirs[1]), "tmp"),)
         for _ in path_dirs:
             if _:
-                self.sys_cmd('chown -R {} {}'.format(user, _))
+                self.sys_cmd(f'chown -R {user} {_}')
 
     def declare_var(self):
         """
@@ -477,14 +469,14 @@ class Core:
         原declare_var 声明环境变量
         :return:
         """
-        path = "export PATH={}/bin/:$PATH".format(self.install_args.get('base_dir'))
+        path = f"export PATH={self.install_args.get('base_dir')}/bin/:$PATH"
         source_file = os.path.join(base_dir, "bash_profile")
         if not os.path.exists(source_file):
             self.sys_cmd("touch {0} && chmod 755 {0}".format(source_file))
         with open(source_file) as f:
             etc_profile = f.read()
         if path not in etc_profile:
-            self.sys_cmd("echo '{}' >> {}".format(path, source_file))
+            self.sys_cmd(f"echo '{path}' >> {source_file}")
 
     def get_config_product_value_str(self):
         """
@@ -514,7 +506,6 @@ class Core:
                         }
         product_str = set()
         for app in self.data_json:
-            product_name = product_info.get(app.get("name", ""))
-            if product_name:
+            if product_name := product_info.get(app.get("name", "")):
                 product_str.add(product_name)
         return ",".join(product_str)

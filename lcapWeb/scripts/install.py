@@ -27,16 +27,15 @@ class InstallDoccWeb(Core):
         port = {}
         for para in self.data_json:
             if para.get('name') == app_name:
-                port = {}
-                for _ in para.get('ports'):
-                    port[_.get('key')] = _.get('default')
-
+                port = {_.get('key'): _.get('default') for _ in para.get('ports')}
         return port.get(port_key)
 
     def run(self):
 
         run_user = self.pub_para_install("run_user", "tengine")
-        self.sys_cmd('chown -R {}:{} {}'.format(run_user, run_user, self.install_args.get("base_dir")))
+        self.sys_cmd(
+            f'chown -R {run_user}:{run_user} {self.install_args.get("base_dir")}'
+        )
 
         base_dir_path = self.install_args.get("base_dir")
         # 创建通用目录

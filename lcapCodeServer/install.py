@@ -38,7 +38,7 @@ class InstallLcapCodeServer(Core):
 
         # 更改文件权限
         scripts_path = os.path.join(base_dir_path, 'bin', 'lcapCodeServer')
-        self.sys_cmd('chmod +x {}'.format(scripts_path))
+        self.sys_cmd(f'chmod +x {scripts_path}')
 
         cw_service_port = self.port.get('service_port')
 
@@ -48,7 +48,6 @@ class InstallLcapCodeServer(Core):
             "CW_MAIN_SERVER_PORT": cw_service_port,
         }
 
-           # set start script
         place_holder_bin_script = {
             "CW_RUN_USER": username,
             "CW_LOCAL_IP": self.local_ip,
